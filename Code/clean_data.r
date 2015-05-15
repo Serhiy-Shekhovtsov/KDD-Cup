@@ -30,7 +30,6 @@ df.apply <- function (data, FUN) {
 	data.frame(unlist(t(sapply(data, FUN=FUN))))
 }
 
-# already saved as RDS
 save_to_RDS <- function () {
 	col_names <- NULL
 	# convert data to RDS
@@ -78,9 +77,7 @@ save_transformation_info <- function() {
 		data <- data[, !(col_names %in% factor_names)]
 		
 		# save min, max, avg and NA rate
-		c_mins <- df.apply(data, FUN=min)
-		min_vals <<- rbind.fill(min_vals, c_mins)
-		
+		min_vals <<- rbind.fill(min_vals, df.apply(data, FUN=min))
 		max_vals <<- rbind.fill(max_vals, df.apply(data, FUN=max))
 		avg_vals <<- rbind.fill(avg_vals, df.apply(data, FUN=mean))
 		
@@ -105,10 +102,11 @@ save_transformation_info <- function() {
 	min_vals <- sapply(min_vals[, num_cols], FUN=min)
 	max_vals <- sapply(max_vals[, num_cols], FUN=max)
 	avg_vals <- sapply(avg_vals[, num_cols], FUN=mean)
+	num_cols <- num_cols[!(is.na(avg_vals))]
 	
-	saveRDS(min_vals, paste0(processing_dir, "min_vals.rds"))
-	saveRDS(max_vals, paste0(processing_dir, "max_vals.rds"))
-	saveRDS(avg_vals, paste0(processing_dir, "avg_vals.rds"))
+	saveRDS(min_vals[, num_cols], paste0(processing_dir, "min_vals.rds"))
+	saveRDS(max_vals[, num_cols], paste0(processing_dir, "max_vals.rds"))
+	saveRDS(avg_vals[, num_cols], paste0(processing_dir, "avg_vals.rds"))
 }
 
 clean_data = function() {
@@ -170,23 +168,4 @@ clean_data = function() {
 		
 		log("data cleaning completed")
 	})
-}
-
-do.a.test = function(){
-	all_levels = readRDS(paste0(processing_dir, "all_levels.rds"))
-	data = readRDS(paste0(processing_dir, "test", ".p", 1, ".rds"))
-	
-	# transform factors to binary features
-	not_num_data = data[, names(all_levels)]
-	rm(data)
-	
-	lapply(names(all_levels), function (name){
-		levels(not_num_data[,name]) <<- all_levels[[name]]
-	})
-	rm(all_levels)
-	
-	print(paste("extracted not_num_data, size=", object.size(not_num_data)))
-	not_num_data
-	#not_num_data_transformed = acm.disjonctif(not_num_data)
-	#print(paste("not_num_data transformed, size=", object.size(not_num_data_transformed)))
 }
