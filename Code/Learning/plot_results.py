@@ -3,7 +3,7 @@ import pandas as pd
 from utils import *
 
 results = pd.read_csv(
-    results_dir + 'calculating train and test accuracy per different number of train examples2015-05-22 14-48-23.csv',
+    results_dir + 'accuracy per subsample. gbm. 200 factors2015-05-22 18-39-25.csv',
     header=None).values
 
 x = results[:, 0]
