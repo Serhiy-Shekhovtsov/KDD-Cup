@@ -8,8 +8,8 @@ set.dir <- function () {
 	setwd(this.dir)
 }
 
-processing_dir <- "../Data/processing/"
-clean_dir <- "../Data/clean/"
+processing_dir <- "../../Data/processing/"
+clean_dir <- "../../Data/clean/"
 
 data_types <- c("test", "train")
 chanks <- c(1, 2, 3, 4, 5)
@@ -34,7 +34,7 @@ save_to_RDS <- function () {
 	col_names <- NULL
 	# convert data to RDS
 	for_each_chunk(function (data_type, chunk_i, log) {
-		orig_file_name <- paste0("../Data/src/orange_large_", data_type, ".data.chunk", 
+		orig_file_name <- paste0("../../Data/src/orange_large_", data_type, ".data.chunk", 
 														chunk_i)
 		read_header <- ifelse(chunk_i==1, T, F)
 		data <- read.table(orig_file_name, sep="\t", header=read_header)
@@ -104,9 +104,9 @@ save_transformation_info <- function() {
 	avg_vals <- sapply(avg_vals[, num_cols], FUN=mean)
 	num_cols <- num_cols[!(is.na(avg_vals))]
 	
-	saveRDS(min_vals[, num_cols], paste0(processing_dir, "min_vals.rds"))
-	saveRDS(max_vals[, num_cols], paste0(processing_dir, "max_vals.rds"))
-	saveRDS(avg_vals[, num_cols], paste0(processing_dir, "avg_vals.rds"))
+	saveRDS(min_vals[num_cols], paste0(processing_dir, "min_vals.rds"))
+	saveRDS(max_vals[num_cols], paste0(processing_dir, "max_vals.rds"))
+	saveRDS(avg_vals[num_cols], paste0(processing_dir, "avg_vals.rds"))
 }
 
 clean_data = function() {
@@ -133,7 +133,6 @@ clean_data = function() {
 		row_indcs = 1:nrow(not_num_data)
 		n_parts = 4
 		parts = split(row_indcs, ceiling(row_indcs / (length(row_indcs) / n_parts)))
-		full_matrix = NULL
 		
 		for (part_i in 1:length(parts)) {
 			log("--- cleaning part ", part_i, " ---")
@@ -156,14 +155,23 @@ clean_data = function() {
 				col[is.na(col)] <- avg_vals[name]
 				data[, name] <- (col - min_vals[name]) / max_vals[name] - min_vals[name]
 			})
+			rm(max_vals, min_vals, avg_vals)
 			
 			log("joining original and transformed data")
-			data = cbind(data, transformed)
+			data <- cbind(data, transformed)
 			rm(transformed)
 			
-			log("saving data")
-			saveRDS(data, paste0(clean_dir, data_type, ".", chunk_i, "_", part_i, ".rds"))
+			gc(reset=T)
+			
+			log("creating sparsed matrix")
+			dm <- data.matrix(data)
 			rm(data)
+			
+			m <- Matrix(dm, sparse=T)
+			
+			log("saving data")
+			writeMM(m, paste0(clean_dir, data_type, ".", chunk_i, "_", part_i, ".mm"))
+			rm(m)
 		}
 		
 		log("data cleaning completed")
