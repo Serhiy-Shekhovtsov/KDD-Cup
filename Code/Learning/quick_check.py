@@ -34,10 +34,10 @@ train_labels[train_labels == -1] = 0
 
 # clf = svm.SVC(probability=True)
 # clf = GaussianNB()
-# clf = SGDClassifier(loss='log', alpha=1000, class_weight={0: 580, 1: 1})
+clf = SGDClassifier(loss='log')
 # clf = ensemble.GradientBoostingClassifier(random_state=0, max_features=max_features,
 #                                           subsample=subsample, learning_rate=learning_rate)
-clf = ensemble.RandomForestClassifier(random_state=0, max_features=max_features, max_depth=4)
+# clf = ensemble.RandomForestClassifier(random_state=0, max_features=max_features, max_depth=4)
 
 log("cross_val_score")
 plot_title = "GBM n_factors: %i, subsample: %0.2f, learning_rate: %0.2f" \

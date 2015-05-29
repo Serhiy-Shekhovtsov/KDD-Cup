@@ -24,3 +24,14 @@ for data_type in data_types:
     cPickle.dump(smat, open(clean_data_dir + data_type + ".csc", "w"))
 
     log("saving done")
+
+log("create full_data")
+log("load")
+train_data = cPickle.load(open(clean_data_dir + "train.csc"))
+test_data = cPickle.load(open(clean_data_dir + "test.csc"))
+
+log("save")
+full_data = scipy.sparse.csc_matrix(vstack([test_data, train_data]))
+cPickle.dump(full_data, open(clean_data_dir + "full_data.csc", "w"))
+
+log("done")

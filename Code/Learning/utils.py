@@ -4,10 +4,23 @@ data_dir = '../../Data/'
 clean_data_dir = data_dir + 'clean/'
 labels_dir = clean_data_dir + 'labels/'
 results_dir = data_dir + 'results/'
+src_dir = data_dir + 'src/'
 
 data_types = ["test", "train"]
 data_chunks = [1, 2, 3, 4, 5]
 data_parts = [1, 2, 3, 4]
+
+
+def get_chunks(l, n):
+    avg = len(l) / float(n)
+    out = []
+    last = 0.0
+
+    while last < len(l):
+        out.append(l[int(last):int(last + avg)])
+        last += avg
+
+    return out
 
 
 def log(message, color=None):
