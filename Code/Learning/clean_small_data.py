@@ -28,7 +28,7 @@ numeric_data = numeric_data.fillna(numeric_data.mean())
 # scale data
 numeric_data = preprocessing.scale(numeric_data)
 
-del data, numeric_data
+del data
 
 log("fix not num data")
 
@@ -41,17 +41,19 @@ full_data = None
 for i in range(0, not_num_data.shape[1]):
     log("column " + str(i))
 
+    # convert objects to labels
     enc = preprocessing.LabelEncoder()
     col_data = enc.fit_transform(not_num_data.iloc[:, i])
 
+    # convert labels to binary columns
     enc = preprocessing.OneHotEncoder()
-    col_data = enc.fit_transform(col_data)
-    # full_data = col_data if full_data is None else hstack([full_data, col_data])
-    # full_data = scipy.sparse.csc_matrix(full_data)
+    col_data = enc.fit_transform(pd.DataFrame(col_data))
+    full_data = col_data if full_data is None else hstack([full_data, col_data])
+    full_data = scipy.sparse.csc_matrix(full_data)
 
 log("not num data fixed!")
 
 log("save")
-cPickle.dump(full_data, open(clean_data_dir + "small_data_full.csc", "w"))
+cPickle.dump(numeric_data, open(clean_data_dir + "small_data_full.csc", "w"))
 
 log("done")
