@@ -1,10 +1,17 @@
+import cPickle
 import matplotlib.pyplot as plt
 import pandas as pd
 from utils import *
 
-csv_file_name = "find best n_factors(sparsesvd). max_features=.5, subsample=.9 2015-05-25 23-19-15"
+# file name or "latest"
+csv_file_name = "small_score per max_features. gbm. 255 factors2015-06-03 23-02-20"
 
-results = pd.read_csv(results_dir + csv_file_name + '.csv', header=None).values
+if csv_file_name == "latest":
+    csv_file_name = cPickle.load(open(results_dir + "latest_result.txt"))
+else:
+    csv_file_name = results_dir + csv_file_name + '.csv'
+
+results = pd.read_csv(csv_file_name, header=None).values
 
 x = results[:, 0]
 train_accuracy = results[:, 2]

@@ -3,12 +3,16 @@ from datetime import datetime
 data_dir = '../../Data/'
 clean_data_dir = data_dir + 'clean/'
 labels_dir = clean_data_dir + 'labels/'
+svd_dir = clean_data_dir + 'svd/'
 results_dir = data_dir + 'results/'
 src_dir = data_dir + 'src/'
 
 data_types = ["test", "train"]
 data_chunks = [1, 2, 3, 4, 5]
 data_parts = [1, 2, 3, 4]
+
+small = True
+data_size = "small_" if small else ""
 
 
 def get_chunks(l, n):

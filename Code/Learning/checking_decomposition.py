@@ -13,28 +13,31 @@ from sklearn.utils.extmath import safe_sparse_dot
 from decompose import load_decomposed
 from utils import *
 
-operation_name = "find best n_factors(sparsesvd). max_features=.5, subsample=.9 "
+max_features = .1
+
+operation_name = data_size + "find best n_factors, max_features=%0.2f" % max_features
 log(operation_name)
 
-train_indices = np.load(clean_data_dir + "train_indices.npy")
-train_labels = pd.read_csv(labels_dir + 'orange_large_train_appetency.labels', header=None)
+train_indices = np.load(clean_data_dir + data_size + "train_indices.npy")
+train_labels = pd.read_csv(labels_dir + data_size + 'appetency.labels', header=None)
 train_labels = squeeze(train_labels.values)[train_indices]
 train_labels[train_labels == -1] = 0
 
 results_file_name = results_dir + operation_name + datetime.now().strftime('%Y-%m-%d %H-%M-%S') + ".csv"
 results = []
 
-for n_factors in range(5, 300, 5):
+for n_factors in range(20, 600, 5):
     log("*** n_factors = %i ***" % n_factors)
 
-    train_data = load_decomposed(n_factors, alg="sparsesvd")
+    train_data = load_decomposed(n_factors)  # , alg="sparsesvd"
     train_data = preprocessing.scale(train_data)
 
-    clf = SGDClassifier(loss='log', alpha=1000, class_weight={0: 600, 1: 1})
-    # clf = ensemble.GradientBoostingClassifier(random_state=0, max_features=.5, subsample=.9)
+    # clf = SGDClassifier(loss='log')
+    # , alpha=1000, class_weight={0: 600, 1: 1}
+    clf = ensemble.GradientBoostingClassifier(random_state=9, max_features=max_features)
 
     log("cross_val_score")
-    scores = cross_validation.cross_val_score(clf, train_data, train_labels, cv=3,
+    scores = cross_validation.cross_val_score(clf, train_data, train_labels, cv=7,
                                               verbose=4, scoring='roc_auc')
 
     log("train on whole train val set")

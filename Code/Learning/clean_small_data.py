@@ -24,10 +24,7 @@ log("fix num data")
 
 # replace NaN in numeric data
 numeric_data = numeric_data.fillna(numeric_data.mean())
-
-# scale data
-numeric_data = preprocessing.scale(numeric_data)
-
+numeric_data = scipy.sparse.csc_matrix(numeric_data)
 del data
 
 log("fix not num data")
@@ -51,9 +48,14 @@ for i in range(0, not_num_data.shape[1]):
     full_data = col_data if full_data is None else hstack([full_data, col_data])
     full_data = scipy.sparse.csc_matrix(full_data)
 
-log("not num data fixed!")
+log("not num data binarized")
+
+log("combine num and binary data")
+
+full_data = hstack([numeric_data, full_data])
 
 log("save")
-cPickle.dump(numeric_data, open(clean_data_dir + "small_data_full.csc", "w"))
+cPickle.dump(full_data, open(clean_data_dir + "small_full_data.csc", "w"))
+cPickle.dump(full_data, open(clean_data_dir + "small_train.csc", "w"))
 
 log("done")

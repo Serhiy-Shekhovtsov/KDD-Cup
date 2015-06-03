@@ -10,10 +10,10 @@ from sklearn.metrics import roc_auc_score
 from decompose import load_decomposed
 from utils import *
 
-n_factors = 56
-subsample = .9
+n_factors = 105
+subsample = .5
 
-operation_name = "accuracy per learning_rate. subsample 0.9. gbm. 200 factors"
+operation_name = data_size + "accuracy per learning_rate. subsample 0.9. gbm. 200 factors"
 log(operation_name)
 
 results_file_name = results_dir + operation_name + datetime.now().strftime('%Y-%m-%d %H-%M-%S') + ".csv"
@@ -22,21 +22,21 @@ train_data = train_data = load_decomposed(n_factors, alg="sparsesvd")
 train_data = preprocessing.scale(train_data)
 n_items = train_data.shape[0]
 
-train_indices = np.load(clean_data_dir + "train_indices.npy")
-train_labels = pd.read_csv(labels_dir + 'orange_large_train_toy.labels', header=None)
+train_indices = np.load(clean_data_dir + data_size + "train_indices.npy")
+train_labels = pd.read_csv(labels_dir + data_size + "appetency.labels", header=None)
 train_labels = squeeze(train_labels.values)[train_indices]
 train_labels[train_labels == -1] = 0
 
 results = []
 
-for learning_rate in np.arange(.001, .02, .002):
+for learning_rate in np.arange(.001, .1, .002):
     log("calculating train and test accuracy, learning_rate = %0.3f" % learning_rate)
 
     clf = ensemble.GradientBoostingClassifier(random_state=9, subsample=subsample,
                                               learning_rate=learning_rate)
 
     log("running cross_val_score")
-    scores = cross_validation.cross_val_score(clf, train_data, train_labels, cv=5,
+    scores = cross_validation.cross_val_score(clf, train_data, train_labels, cv=7,
                                               verbose=4, scoring='roc_auc')
 
     log("train on whole train val set")

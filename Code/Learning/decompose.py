@@ -14,7 +14,7 @@ from utils import *
 def load_decomposed(n_factors, alg="TruncatedSVD"):
     log("load_decomposed started")
 
-    file_name = clean_data_dir + "SVD_" + str(n_factors) + "_factors"
+    file_name = svd_dir + data_size + str(n_factors) + "_factors"
     if alg == "sparsesvd":
         file_name += "(sparsesvd)"
     file_name += ".npy"
@@ -26,8 +26,8 @@ def load_decomposed(n_factors, alg="TruncatedSVD"):
     log("decompose and save to .npy file")
 
     log("reading data files")
-    full_data = cPickle.load(open(clean_data_dir + "full_data.csc"))
-    data = cPickle.load(open(clean_data_dir + "train_val_set.csc"))
+    full_data = cPickle.load(open(clean_data_dir + data_size + "full_data.csc"))
+    data = cPickle.load(open(clean_data_dir + data_size + "train_val_set.csc"))
 
     transformed_data = None
 
